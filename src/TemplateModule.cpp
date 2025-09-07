@@ -3,7 +3,7 @@
 namespace uazips
 {
 
-    TemplateModule::TemplateModule()
+    TemplateModule::TemplateModule() : Module()
     {
 
     }

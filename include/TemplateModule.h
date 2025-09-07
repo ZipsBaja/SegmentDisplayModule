@@ -11,7 +11,7 @@ namespace uazips
         TemplateModule();
         virtual ~TemplateModule();
 
-        virtual void Initialize() override;
+        virtual bool Initialize() override;
     };
 
 }

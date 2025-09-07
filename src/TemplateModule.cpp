@@ -13,7 +13,7 @@ namespace uazips
 
     }
 
-    void TemplateModule::Initialize()
+    bool TemplateModule::Initialize()
     {
 
     }

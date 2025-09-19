@@ -3,4 +3,4 @@ build
 
 # Common name for the main library, add the path if it is different.
 lib/zipslib
-lib/zipspicolib
+lib/ZipsPicoLib

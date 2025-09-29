@@ -13,6 +13,23 @@ extern "C"
 namespace uazips
 {
 
+    SegmentDisplayModule::SegmentDisplaySettings SegmentDisplayModule::Create(
+        PIO pio, uint8_t clk_pin, uint8_t dio_pin,
+        uint8_t sm, uint8_t brightness,
+        bool colon, pio_sm_config config)
+    {
+        return SegmentDisplaySettings{
+            .pio = pio,
+            .clk_pin = clk_pin,
+            .dio_pin = dio_pin,
+            .sm = sm,
+            .brightness = brightness,
+            .colon = colon,
+            .config = config,
+            .device_ptr = nullptr
+        };
+    }
+
     SegmentDisplayModule::SegmentDisplayModule(SegmentDisplaySettings& settings)
         : CollectionModule(), device_count(1), digit_count(device_count * digits_per_device)
     {
@@ -79,6 +96,7 @@ namespace uazips
     {
         index = index >= device_count ? device_count - 1 : index;
         TM1637_clear(m_elements[index]);
+        
     }
 
     void SegmentDisplayModule::DisplayClear(const SegmentDisplaySettings& device)
@@ -166,7 +184,7 @@ namespace uazips
     {
         digit_index = digit_index >= digit_count ? digit_count - 1 : digit_index;
 
-        TM1637_put_2_bytes(m_elements[digit_index / digit_count], digit_index, num_to_hex(value, 0x00));
+        TM1637_put_2_bytes(m_elements[digit_index / digits_per_device], digit_index % digits_per_device, num_to_hex(value, 0x00));
     }
 
     void SegmentDisplayModule::DisplaySet(size_t index, char value)
@@ -213,14 +231,17 @@ namespace uazips
     void SegmentDisplayModule::DisplaySegmentsAll(const uint32_t* segments_array, size_t arr_size)
     {
         arr_size = arr_size > device_count ? device_count : arr_size;
-        if (arr_size < device_count)
-        {
-            for (size_t i = 0; i < device_count; i++)
-            {
-                uint32_t hex = GetHexFromSegments(segments_array[i]);
 
-                TM1637_put_4_bytes(m_elements[i], 0, hex);
-            }
+        for (size_t i = 0; i < device_count; i++)
+        {
+            uint32_t hex;
+
+            if (i < arr_size)
+                hex = GetHexFromSegments(segments_array[i]);
+            else
+                hex = GetHexFromSegments(segments_array[arr_size]);
+
+            TM1637_put_4_bytes(m_elements[i], 0, hex);
         }
     }
 
@@ -252,16 +273,24 @@ namespace uazips
 
         TimeHandler th;
 
+        const size_t display_count = frames.rows;
+        const size_t frame_count = frames.cols;
+
         while (!loop_until())
         {
-            for (size_t current_frame = reverse ? frames.cols - 1 : 0; reverse ? current_frame >= 0 : current_frame < frames.cols; reverse? current_frame-- : current_frame++)
+            for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
                 if (loop_until())
                 {
                     DisplayClearAll();
                     return;
                 }
-                DisplaySegmentsAll(frames.data + current_frame * frames.cols, frames.rows);
+
+                uint32_t frames_to_show[display_count];
+                for (size_t i = 0; i < display_count; i++)
+                    frames_to_show[i] = (frames.data + frame_count * i)[current_frame];
+
+                DisplaySegmentsAll(frames_to_show, display_count);
 
                 while (cumulative_us < us_interval)
                 {
@@ -286,9 +315,11 @@ namespace uazips
 
         TimeHandler th;
 
+        const size_t frame_count = frames.length;
+
         while (!loop_until())
         {
-            for (size_t current_frame = reverse ? frames.length - 1 : 0; reverse ? current_frame >= 0 : current_frame < frames.length; reverse? current_frame-- : current_frame++)
+            for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
                 if (loop_until())
                 {
@@ -329,7 +360,12 @@ namespace uazips
                     DisplayClearAll();
                     return;
                 }
-                DisplaySegmentsAll(frames[current_frame], display_count);
+
+                uint32_t frames_to_show[display_count];
+                for (size_t i = 0; i < display_count; i++)
+                    frames_to_show[i] = frames[i][current_frame];
+
+                DisplaySegmentsAll(frames_to_show, display_count);
 
                 while (cumulative_us < us_interval)
                 {

@@ -39,6 +39,8 @@ namespace uazips
             TM1637_device* device_ptr;
         };
 
+        static SegmentDisplaySettings Create(PIO pio, uint8_t clk_pin, uint8_t dio_pin, uint8_t sm, uint8_t brightness, bool colon, pio_sm_config config);
+
     public:
         SegmentDisplayModule(SegmentDisplaySettings& settings);
         SegmentDisplayModule(SegmentDisplaySettings* settings, size_t display_amount);

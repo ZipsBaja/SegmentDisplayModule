@@ -1,20 +1,10 @@
 #include <SegmentDisplayModule.h>
 #include <Animations.h>
+#include <util/FunctionUtils.h>
+#include <hardware/Button.h>
 #include <ZipsLib.h>
 
-uint32_t current_loop = 0;
-constexpr uint32_t max_loop = 5000000;
-
-bool loop_break()
-{
-    current_loop++;
-    if (current_loop >= max_loop)
-    {
-        current_loop = 0;
-        return 1;
-    }
-    return 0;
-}
+using namespace uazips;
 
 int main()
 {
@@ -46,16 +36,9 @@ int main()
 
     uazips::Module::InitAll();
 
-    while (1)
-    {
-    mod.DisplayTextAll("test");
-    LOG("Displaying \"test\"\n");
-    sleep_ms(1000);
-    mod.DisplayAnimationAll(uazips::animations::onedisplay::anim_looping, 5.f, &loop_break);
-    mod.DisplayAnimationAll(uazips::animations::onedisplay::anim_fall, 1.f, &loop_break);
-    
-    
-    sleep_ms(1000);
-    }
+    mod.DisplayTextAll("Testing");
+
+    while (1) {}
+
     return 0;
 }

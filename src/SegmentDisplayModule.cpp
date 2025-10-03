@@ -266,7 +266,7 @@ namespace uazips
         DisplaySegments(FindElement(device.device_ptr), segments);
     }
 
-    void SegmentDisplayModule::DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
     {
         uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
         uint64_t cumulative_us = 0;
@@ -276,11 +276,11 @@ namespace uazips
         const size_t display_count = frames.rows;
         const size_t frame_count = frames.cols;
 
-        while (!loop_until())
+        while (!loop_until(user_data))
         {
             for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
-                if (loop_until())
+                if (loop_until(user_data))
                 {
                     DisplayClearAll();
                     return;
@@ -294,7 +294,7 @@ namespace uazips
 
                 while (cumulative_us < us_interval)
                 {
-                    if (loop_until())
+                    if (loop_until(user_data))
                     {
                         DisplayClearAll();
                         return;
@@ -308,7 +308,17 @@ namespace uazips
         DisplayClearAll();
     }
 
-    void SegmentDisplayModule::DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse)
+    {
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimationAll(frames, target_fps, func, data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
     {
         uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
         uint64_t cumulative_us = 0;
@@ -317,11 +327,11 @@ namespace uazips
 
         const size_t frame_count = frames.length;
 
-        while (!loop_until())
+        while (!loop_until(user_data))
         {
             for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
-                if (loop_until())
+                if (loop_until(user_data))
                 {
                     DisplayClearAll();
                     return;
@@ -330,7 +340,7 @@ namespace uazips
 
                 while (cumulative_us < us_interval)
                 {
-                    if (loop_until())
+                    if (loop_until(user_data))
                     {
                         DisplayClearAll();
                         return;
@@ -344,18 +354,29 @@ namespace uazips
         DisplayClearAll();
     }
 
-    void SegmentDisplayModule::DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse)
     {
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimationAll(frames, target_fps, func, data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
+    {
+        display_count = display_count > device_count ? device_count : display_count;
         uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
         uint64_t cumulative_us = 0;
 
         TimeHandler th;
 
-        while (!loop_until())
+        while (!loop_until(user_data))
         {
             for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
-                if (loop_until())
+                if (loop_until(user_data))
                 {
                     DisplayClearAll();
                     return;
@@ -369,7 +390,7 @@ namespace uazips
 
                 while (cumulative_us < us_interval)
                 {
-                    if (loop_until())
+                    if (loop_until(user_data))
                     {
                         DisplayClearAll();
                         return;
@@ -383,19 +404,29 @@ namespace uazips
         DisplayClearAll();
     }
 
-    void SegmentDisplayModule::DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const EventActionSupplier& event_device, bool reverse)
+    {
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimationAll(frames, frame_count, display_count, target_fps, func, data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
     {
         uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
         uint64_t cumulative_us = 0;
 
         TimeHandler th;
 
-        while (!loop_until())
+        while (!loop_until(user_data))
         {
             th.Update();
             for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
-                if (loop_until())
+                if (loop_until(user_data))
                 {
                     DisplayClearAll();
                     return;
@@ -404,7 +435,7 @@ namespace uazips
                 
                 while (cumulative_us < us_interval) // Sleep semantics voids the break-out-of-loop idea given in parameters
                 {
-                    if (loop_until())
+                    if (loop_until(user_data))
                     {
                         DisplayClearAll();
                         return;
@@ -418,7 +449,17 @@ namespace uazips
         DisplayClearAll();
     }
 
-    void SegmentDisplayModule::DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse)
+    {
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimationAll(frames, frame_count, target_fps, func, data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
     {
         index = index >= device_count ? device_count - 1 : index;
         uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
@@ -426,12 +467,12 @@ namespace uazips
 
         TimeHandler th;
 
-        while (!loop_until())
+        while (!loop_until(user_data))
         {
             th.Update();
             for (size_t current_frame = reverse ? frames.length - 1 : 0; reverse ? current_frame >= 0 : current_frame < frames.length; reverse? current_frame-- : current_frame++)
             {
-                if (loop_until())
+                if (loop_until(user_data))
                 {
                     DisplayClearAll();
                     return;
@@ -440,7 +481,7 @@ namespace uazips
 
                 while (cumulative_us < us_interval)
                 {
-                    if (loop_until())
+                    if (loop_until(user_data))
                     {
                         DisplayClear(index);
                         return;
@@ -453,12 +494,32 @@ namespace uazips
         DisplayClear(index);
     }
 
-    void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse)
     {
-        DisplayAnimation(FindElement(device.device_ptr), frames, target_fps, loop_until, reverse);
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimation(index, frames, target_fps, func, data, reverse);
     }
 
-    void SegmentDisplayModule::DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
+    {
+        DisplayAnimation(FindElement(device.device_ptr), frames, target_fps, loop_until, user_data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse)
+    {
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimation(FindElement(device.device_ptr), frames, target_fps, func, data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
     {
         index = index >= device_count ? device_count - 1 : index;
         uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
@@ -466,12 +527,12 @@ namespace uazips
 
         TimeHandler th;
 
-        while (!loop_until())
+        while (!loop_until(user_data))
         {
             th.Update();
             for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
             {
-                if (loop_until())
+                if (loop_until(user_data))
                 {
                     DisplayClearAll();
                     return;
@@ -480,7 +541,7 @@ namespace uazips
 
                 while (cumulative_us < us_interval)
                 {
-                    if (loop_until())
+                    if (loop_until(user_data))
                     {
                         DisplayClear(index);
                         return;
@@ -493,8 +554,28 @@ namespace uazips
         DisplayClear(index);
     }
 
-    void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse)
+    void SegmentDisplayModule::DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse)
     {
-        DisplayAnimation(FindElement(device.device_ptr), frames, frame_count, target_fps, loop_until, reverse);
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimation(index, frames, frame_count, target_fps, func, data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data, bool reverse)
+    {
+        DisplayAnimation(FindElement(device.device_ptr), frames, frame_count, target_fps, loop_until, user_data, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse)
+    {
+        void* data = nullptr;
+        std::function<bool(void*)> func = [event_device, &data](void* user_data){
+            data = user_data;
+            return event_device.GetAction()((Event*)user_data);
+        };
+        DisplayAnimation(FindElement(device.device_ptr), frames, frame_count, target_fps, func, data, reverse);
     }
 }

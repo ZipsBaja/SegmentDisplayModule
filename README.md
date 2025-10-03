@@ -1,5 +1,5 @@
-# Pico Module Template
+# Segment Display Module
 
-##### Use this template for creating code that contains source files. These modules can be included with git submodules to use in your code.
+#### This repo takes https://github.com/zyoung71/TM1637-pico and wraps it in a module for C++.
 
-Note: You must manually clone the ZipsPicoLib repository to a location in the module project and link it to test it manually with the example included.
+Include this repo as a submodule to your project, and add to your CMakeLists.txt accordingly.

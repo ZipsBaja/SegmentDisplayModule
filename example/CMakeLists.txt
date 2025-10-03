@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+
 set(PICO_BOARD pico)
 #set(PICO_BOARD pico_w)
 #set(PICO_BOARD pico2)
@@ -32,7 +35,7 @@ set(CXX_STANDARD 17)
 
 # Enable and disable features here.
 option(USING_PRINT "Enable printing to stdout. Use this while testing and debugging." ON) # Switch to OFF when project is complete.
-option(USING_MULTICORE "Enable use of the Pico's second core. Enable this for parallel processing or separate tasks." OFF)
+option(USING_MULTICORE "Enable use of the Pico's second core. Enable this for parallel processing or separate tasks." ON)
 
 # Add theses definitions to your IDE.
 if (USING_PRINT)    

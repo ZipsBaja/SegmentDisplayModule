@@ -2,6 +2,7 @@
 
 #include <module/CollectionModule.h> // Assuming ZipsPicoLib is included in project.
 #include <util/ArrayView.h>
+#include <event/Event.h>
 
 #include <stdio.h>
 
@@ -14,7 +15,7 @@ extern "C"
 
 namespace uazips
 {
-
+    
     constexpr size_t digits_per_device = 4;
 
     class SegmentDisplayModule : public CollectionModule<TM1637_device>
@@ -119,14 +120,22 @@ namespace uazips
         void DisplaySegments(size_t index, uint32_t segments);
         void DisplaySegments(const SegmentDisplaySettings& device, uint32_t segments);
 
-        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);    
-        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
+        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);        
+        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
+        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);        
+        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
+        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);    
     };
 
 }

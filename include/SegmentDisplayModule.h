@@ -23,6 +23,7 @@ namespace uazips
     private:
         size_t device_count;
         size_t digit_count;
+        bool break_animation;
 
         static uint32_t GetHexFromSegments(uint32_t segments);
 
@@ -120,22 +121,79 @@ namespace uazips
         void DisplaySegments(size_t index, uint32_t segments);
         void DisplaySegments(const SegmentDisplaySettings& device, uint32_t segments);
 
-        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
-        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
-        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);        
-        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const EventActionSupplier& event_device, bool reverse = false);
-        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);        
-        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool(void*)>& loop_until, void* user_data = nullptr, bool reverse = false);
-        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const EventActionSupplier& event_device, bool reverse = false);    
+        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
+        
+        template<class EventType> void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimationAll(frames, target_fps, [&](){ return break_animation; }, reverse);
+        }
+        template<class EventType> void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimationAll(frames, target_fps, [&](){ return break_animation; }, reverse);
+        }
+        template<class EventType> void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimationAll(frames, frame_count, display_count, target_fps, [&](){ return break_animation; }, reverse);
+        }
+        template<class EventType> void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimationAll(frames, frame_count, target_fps, [&](){ return break_animation; }, reverse);
+        }
+        template<class EventType> void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimation(index, frames, target_fps, [&](){ return break_animation; }, reverse);
+        }     
+        template<class EventType> void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimation(device, frames, target_fps, [&](){ return break_animation; }, reverse);
+        }
+        template<class EventType> void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimation(index, frames, frame_count, target_fps, [&](){ return break_animation; }, reverse);
+        }      
+        template<class EventType> void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
+        {
+            bool break_animation = false;
+            event_device.AddListener([&](const EventType* event){
+                break_animation = true;
+            });
+            DisplayAnimation(device, frames, frame_count, target_fps, [&](){ return break_animation; }, reverse);
+        } 
     };
 
 }

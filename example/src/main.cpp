@@ -2,9 +2,16 @@
 #include <Animations.h>
 #include <util/FunctionUtils.h>
 #include <hardware/Button.h>
+#include <hardware/TimeDevice.h>
 #include <ZipsLib.h>
+#include <pico/multicore.h>
 
 using namespace uazips;
+
+void core1()
+{
+    Event::HandleAllEvents(true);
+}
 
 int main()
 {
@@ -34,10 +41,19 @@ int main()
 
     uazips::SegmentDisplayModule mod(settings, 2);
 
+    CountdownTimer timer;
+    Button button = 13;
+
     uazips::Module::InitAll();
 
-    mod.DisplayTextAll("Testing");
+    multicore_launch_core1(&core1);
 
+    mod.DisplayTextAll("display");
+    sleep_ms(2000);
+    timer.Begin(5000);
+    mod.DisplayAnimationAll(animations::twodisplay::anim_looping, 15, timer);
+
+    BEGIN_LOOP();
     while (1) {}
 
     return 0;

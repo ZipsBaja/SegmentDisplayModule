@@ -64,6 +64,7 @@ add_executable(Example src/main.cpp)
 target_link_libraries(Example
     ZipsSegmentDisplayModule
     pico_stdlib
+    pico_multicore
 )
 
 pico_enable_stdio_usb(${PROJECT_NAME} 1)

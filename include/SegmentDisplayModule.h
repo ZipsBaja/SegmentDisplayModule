@@ -143,66 +143,82 @@ namespace uazips
         template<class EventType> void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimationAll(frames, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }
         template<class EventType> void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimationAll(frames, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }
         template<class EventType> void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimationAll(frames, frame_count, display_count, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }
         template<class EventType> void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimationAll(frames, frame_count, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }
         template<class EventType> void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimation(index, frames, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }     
         template<class EventType> void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimation(device, frames, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }
         template<class EventType> void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimation(index, frames, frame_count, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         }      
         template<class EventType> void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, EventSource<EventType>& event_device, bool reverse = false)
         {
             bool break_animation = false;
-            event_device.AddListener([&](const EventType* event){
+            const char* id = event_device.AddListener([&](const EventType* event){
                 break_animation = true;
+                event_device.RemoveListener(id);
             });
             DisplayAnimation(device, frames, frame_count, target_fps, [&](){ return break_animation; }, reverse);
+            delete id;
         } 
     };
 

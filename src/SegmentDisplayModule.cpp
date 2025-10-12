@@ -13,7 +13,7 @@ extern "C"
 namespace uazips
 {
 
-    SegmentDisplayModule::SegmentDisplaySettings SegmentDisplayModule::Create(
+    constexpr SegmentDisplayModule::SegmentDisplaySettings SegmentDisplayModule::Create(
         PIO pio, uint8_t clk_pin, uint8_t dio_pin,
         uint8_t sm, uint8_t brightness,
         bool colon)

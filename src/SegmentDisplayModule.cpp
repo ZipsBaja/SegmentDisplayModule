@@ -13,22 +13,6 @@ extern "C"
 namespace uazips
 {
 
-    constexpr SegmentDisplayModule::SegmentDisplaySettings SegmentDisplayModule::Create(
-        PIO pio, uint8_t clk_pin, uint8_t dio_pin,
-        uint8_t sm, uint8_t brightness,
-        bool colon)
-    {
-        return SegmentDisplaySettings{
-            .pio = pio,
-            .clk_pin = clk_pin,
-            .dio_pin = dio_pin,
-            .sm = sm,
-            .brightness = brightness,
-            .colon = colon,
-            .device_ptr = nullptr
-        };
-    }
-
     SegmentDisplayModule::SegmentDisplayModule(SegmentDisplaySettings& settings)
         : CollectionModule(), device_count(1), digit_count(device_count * digits_per_device), break_animation(false)
     {

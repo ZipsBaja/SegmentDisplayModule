@@ -25,7 +25,7 @@ namespace uazips
         dev->sm = settings.sm;
         dev->brightness = settings.brightness;
         dev->colon = settings.colon;
-        dev->config = settings.config;
+        dev->_config = settings.config;
 
         settings.device_ptr = dev;
         m_elements.push_back(dev);
@@ -45,7 +45,7 @@ namespace uazips
             dev->sm = settings[i].sm;
             dev->brightness = settings[i].brightness;
             dev->colon = settings[i].colon;
-            dev->config = settings[i].config;
+            dev->_config = settings[i].config;
 
             settings[i].device_ptr = dev;
             m_elements.push_back(dev);
@@ -430,8 +430,9 @@ namespace uazips
                         return;
                     }
                     th.Update();
-                    cumulative_us -= us_interval;
+                    cumulative_us += th.DeltaTime;
                 }
+                cumulative_us -= us_interval;
             }
         }
         DisplayClear(index);
@@ -470,8 +471,9 @@ namespace uazips
                         return;
                     }
                     th.Update();
-                    cumulative_us -= us_interval;
+                    cumulative_us += th.DeltaTime;
                 }
+                cumulative_us -= us_interval;
             }
         }
         DisplayClear(index);
@@ -480,6 +482,87 @@ namespace uazips
     void SegmentDisplayModule::DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse)
     {
         DisplayAnimation(FindElement(device.device_ptr), frames, frame_count, target_fps, loop_until, reverse);
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnceAll(const ArrayView2D<uint32_t>& frames, float target_fps, bool keep_last_frame, bool reverse)
+    {
+        uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
+        uint64_t cumulative_us = 0;
+
+        TimeHandler th;
+
+        const size_t display_count = frames.rows;
+        const size_t frame_count = frames.cols;
+
+        for (size_t current_frame = reverse ? frame_count - 1 : 0; reverse ? current_frame >= 0 : current_frame < frame_count; reverse? current_frame-- : current_frame++)
+        {
+            uint32_t frames_to_show[display_count];
+            for (size_t i = 0; i < display_count; i++)
+                frames_to_show[i] = (frames.data + frame_count * i)[current_frame];
+
+            DisplaySegmentsAll(frames_to_show, display_count);
+
+            while (cumulative_us < us_interval)
+            {
+                th.Update();
+                cumulative_us += th.DeltaTime;
+            }
+            cumulative_us -= us_interval;
+        }
+        if (!keep_last_frame)
+            DisplayClearAll();
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnceAll(const ArrayView<uint32_t>& frames, float target_fps, bool keep_last_frame, bool reverse)
+    {
+        uint64_t us_interval = static_cast<uint64_t>(1.0f / target_fps * 1e6f);
+        uint64_t cumulative_us = 0;
+
+        TimeHandler th;
+
+        for (size_t current_frame = reverse ? frames.length - 1 : 0; reverse ? current_frame >= 0 : current_frame < frames.length; reverse? current_frame-- : current_frame++)
+        {
+            DisplaySegmentsAll(frames[current_frame]);
+
+            while (cumulative_us < us_interval)
+            {
+                th.Update();
+                cumulative_us += th.DeltaTime;
+            }
+            cumulative_us -= us_interval;
+        }
+        if (!keep_last_frame)
+            DisplayClearAll();
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnceAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, bool keep_last_frame, bool reverse)
+    {
+
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnceAll(const uint32_t* frames, size_t frame_count, float target_fps, bool keep_last_frame, bool reverse)
+    {
+
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnce(size_t index, const ArrayView<uint32_t>& frames, float target_fps, bool keep_last_frame, bool reverse)
+    {
+
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnce(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, bool keep_last_frame, bool reverse)
+    {
+
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnce(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, bool keep_last_frame, bool reverse)
+    {
+
+    }
+
+    void SegmentDisplayModule::DisplayAnimationOnce(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, bool keep_last_frame, bool reverse)
+    {
+
     }
 
 }

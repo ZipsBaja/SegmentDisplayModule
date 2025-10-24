@@ -8,65 +8,27 @@
 
 using namespace uazips;
 
-void core1()
-{
-    Event::HandleAllEvents(true);
-}
+static SegmentDisplayModule::SegmentDisplaySettings settings[3] = {
+    SegmentDisplayModule::Create(pio0, 5, 4, 0, 7, 0, 0),
+    SegmentDisplayModule::Create(pio0, 7, 6, 1, 7, 0, 0),
+    SegmentDisplayModule::Create(pio0, 9, 8, 2, 7, 0, 0)
+};
 
 int main()
 {
     BEGIN_SETUP();
 
-    uazips::SegmentDisplayModule::SegmentDisplaySettings settings[3] = 
-    {
-        {
-            .pio = pio0,
-            .clk_pin = 5,
-            .dio_pin = 4,
-            .sm = 0,
-            .brightness = 7,
-            .colon = 0,
-            .is_upside_down = false,
-            .device_ptr = nullptr
-        },
-        {
-            .pio = pio0,
-            .clk_pin = 7,
-            .dio_pin = 6,
-            .sm = 1,
-            .brightness = 7,
-            .colon = 0,
-            .is_upside_down = false,
-            .device_ptr = nullptr
-        },
-        {
-            .pio = pio0,
-            .clk_pin = 9,
-            .dio_pin = 8,
-            .sm = 2,
-            .brightness = 7,
-            .colon = 0,
-            .is_upside_down = false,
-            .device_ptr = nullptr
-        }
-    };
+    SegmentDisplayModule mod(settings, 3);
 
-    uazips::SegmentDisplayModule mod(settings, 3);
+    Module::InitAll();
 
-    CountdownTimer timer;
-    Button button = 13;
-
-    uazips::Module::InitAll();
-
-    multicore_launch_core1(&core1);
-
-    mod.DisplayTextAll("123456789000");
-    sleep_ms(2000);
-    timer.Begin(5000);
-    mod.DisplayAnimationAll(animations::threedisplay::anim_looping, 15, timer);
-
+    mod.DisplayTextAll("test12345678");
+    
     BEGIN_LOOP();
-    while (1) {}
+    while (1) {
+        tight_loop_contents();
+        LOG("step\n");
+    }
 
     return 0;
 }

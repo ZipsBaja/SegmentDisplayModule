@@ -6,8 +6,6 @@
 
 #include <stdio.h>
 
-#include <functional>
-
 extern "C"
 {
 #include <PicoTM1637.h>
@@ -21,9 +19,8 @@ namespace uazips
     class SegmentDisplayModule : public CollectionModule<TM1637_device>
     {
     private:
-        size_t device_count;
-        size_t digit_count;
-        bool break_animation;
+        const size_t device_count;
+        const size_t digit_count;
 
         static uint32_t GetHexFromSegments(uint32_t segments);
 
@@ -137,18 +134,18 @@ namespace uazips
         void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
         void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
         void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, bool* loop_until, bool reverse = false);
-        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, bool* loop_until, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, bool* loop_until, bool reverse = false);
-        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, bool* loop_until, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView2D<uint32_t>& frames, float target_fps, const bool* loop_until, bool reverse = false);
+        void DisplayAnimationAll(const ArrayView<uint32_t>& frames, float target_fps, const bool* loop_until, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, const bool* loop_until, bool reverse = false);
+        void DisplayAnimationAll(const uint32_t* frames, size_t frame_count, float target_fps, const bool* loop_until, bool reverse = false);
         void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
         void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
         void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
         void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const std::function<bool()>& loop_until, bool reverse = false);
-        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, bool* loop_until, bool reverse = false);
-        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, bool* loop_until, bool reverse = false);
-        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, bool* loop_until, bool reverse = false);
-        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, bool* loop_until, bool reverse = false);
+        void DisplayAnimation(size_t index, const ArrayView<uint32_t>& frames, float target_fps, const bool* loop_until, bool reverse = false);
+        void DisplayAnimation(const SegmentDisplaySettings& device, const ArrayView<uint32_t>& frames, float target_fps, const bool* loop_until, bool reverse = false);
+        void DisplayAnimation(size_t index, const uint32_t* frames, size_t frame_count, float target_fps, const bool* loop_until, bool reverse = false);
+        void DisplayAnimation(const SegmentDisplaySettings& device, const uint32_t* frames, size_t frame_count, float target_fps, const bool* loop_until, bool reverse = false);
         void DisplayAnimationOnceAll(const ArrayView2D<uint32_t>& frames, float target_fps, bool keep_last_frame = false, bool reverse = false);
         void DisplayAnimationOnceAll(const ArrayView<uint32_t>& frames, float target_fps, bool keep_last_frame = false, bool reverse = false);
         void DisplayAnimationOnceAll(const uint32_t** frames, size_t frame_count, size_t display_count, float target_fps, bool keep_last_frame = false, bool reverse = false);
